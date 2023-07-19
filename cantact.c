@@ -16,8 +16,8 @@ int Find_by_name(contact* con,char tag[])
 void add_num(contact *con)
 {
 	assert(con);
-
-	if (con->sz < SIZE)
+	
+	if (con->sz < con->max)
 	{
 		printf("请输入姓名\n");
 		scanf("%s", con->data[con->sz].name);
@@ -32,8 +32,31 @@ void add_num(contact *con)
 	}
 	else
 	{
-		printf("已满\n");
+		person* pst;
+		pst=(person*)realloc(con->data,sizeof(person)*(SIZE+1));
+		if (NULL == pst)
+		{
+			perror("add_num");
+			return;
+		}
+		else
+		{
+			(con->data) = pst;
+			con->max++;
+			printf("空间已满，将新增空间，目前空间为%d\n",con->max);
+			printf("请输入姓名\n");
+			scanf("%s", con->data[con->sz].name);
+			printf("请输入年龄\n");
+			scanf("%d", &(con->data[con->sz].age));
+			printf("请输入性别\n");
+			scanf("%s", con->data[con->sz].sex);
+			printf("请输入电话号码\n");
+			scanf("%s", con->data[con->sz].tele);
+			printf("请输入地址\n");
+			scanf("%s", con->data[con->sz].add);
+		}
 	}
+
 	con->sz++;
 }
 void del_num(contact* con)
@@ -43,7 +66,7 @@ void del_num(contact* con)
 	char tag[NAME];
 	scanf("%s", tag);
 	int i = Find_by_name(con, tag);
-	memmove(&(con->data[i]), &(con->data[i + 1]),sizeof(con->data));
+	memmove(&(con->data[i]), &(con->data[i + 1]),sizeof(person));//注意这边不能con->data,data已经变成地址了
 	con->sz--;
 	printf("delete successfully!\n");
 
@@ -91,16 +114,17 @@ void show_num(contact* con)
 }
 //这段值得反复学习！！！！！
  int cam_by_name(const void* p1, const void*p2)
-{
-	 return strcmp(((contact*)p1)->data[0].name, ((contact*)p2)->data[1].name);
+ {
+	 person*personA = (person*)p1;
+	 person* personB =(person*)p2;
+	 return strcmp(personA->name, personB->name);
 }
 
 void sort_num(contact* con)
 {
 	assert(con);
 	printf("将以姓名为要求排序\n");
-	qsort(&con, con->sz,sizeof(con->data),cam_by_name);
-	show_num(con);
+	qsort(con->data, con->sz,sizeof(person),cam_by_name);
 }
 
 void find_num(contact* con)
@@ -131,9 +155,15 @@ void init_con(contact* con)
 	/*con->sz = 0;
 	con->data[con->sz].name = ;*/
 	//一个个调用比较复杂，可以使用memset
-	memset(con->data, 0, sizeof(person));
+	assert(con);
+	con->max = SIZE;
 	con->sz = 0;
-
+	con->data = (person*)malloc(sizeof(person) * SIZE);
+	if (NULL == con->data)
+	{
+		perror("init_con");
+		return;
+	}
 }
 //search by name ,if name is found,return index,else return 0
 

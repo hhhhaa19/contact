@@ -7,7 +7,7 @@ void menu()
 	printf("*****1:add      2:del ****\n");
 	printf("*****3:modtify  4:show ***\n");
 	printf("*****5:sort     6:find ***\n");
-	printf("*****0:exit***************\n");
+	printf("******* defaut:exit ******\n");
 }
 int main()
 {
@@ -18,13 +18,16 @@ int main()
 	{
 		menu();
 		scanf("%d", &input);
-		if (input != 0)
+		if (input >= 0 && input <= 6)
 		{
 			void (*Ctact[7])(contact * con) = { NULL,add_num,del_num,modi_num,show_num,sort_num,find_num };
 			Ctact[input](&con);
 		}
 		else
+		{
+			printf("输入错误信息，将退出\n");
 			break;
+		}
 		
 	} while (1);
 
