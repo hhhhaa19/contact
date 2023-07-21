@@ -32,3 +32,4 @@ void show_num(contact* con);
 void sort_num(contact* con);
 void find_num(contact* con);
 void init_con(contact* con);
+void exit_num(contact* con);

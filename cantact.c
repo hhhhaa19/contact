@@ -13,12 +13,46 @@ int Find_by_name(contact* con,char tag[])
 	}
 	return -1;
 }
-void add_num(contact *con)
+//检查并增容
+int check_add(contact* con)
+{
+	if (con->sz < con->max)
+		return 0;
+	else
+	{
+		person* pst;
+		pst = (person*)realloc(con->data, sizeof(person) * (SIZE + 1));
+		if (NULL == pst)
+		{
+			perror("add_num");
+			return -1;
+		}
+		con->max++;
+		printf("增容成功\n");
+	}
+}
+void add_from(contact* con)
 {
 	assert(con);
-	
-	if (con->sz < con->max)
+	printf("首先将查取已存在的通讯录\n");
+	FILE* pf = fopen("contact.txt", "r");
+	if (pf == NULL)
 	{
+		perror("fopen");
+		return;
+	}
+	else
+	{
+		while (fread(con->data + con->sz, sizeof(person), 1, pf))
+		{
+			con->sz++;
+		}
+	}
+	fclose(pf);
+	pf = NULL;
+}
+void add_num(contact * con)
+{
 		printf("请输入姓名\n");
 		scanf("%s", con->data[con->sz].name);
 		printf("请输入年龄\n");
@@ -29,34 +63,6 @@ void add_num(contact *con)
 		scanf("%s", con->data[con->sz].tele);
 		printf("请输入地址\n");
 		scanf("%s", con->data[con->sz].add);
-	}
-	else
-	{
-		person* pst;
-		pst=(person*)realloc(con->data,sizeof(person)*(SIZE+1));
-		if (NULL == pst)
-		{
-			perror("add_num");
-			return;
-		}
-		else
-		{
-			(con->data) = pst;
-			con->max++;
-			printf("空间已满，将新增空间，目前空间为%d\n",con->max);
-			printf("请输入姓名\n");
-			scanf("%s", con->data[con->sz].name);
-			printf("请输入年龄\n");
-			scanf("%d", &(con->data[con->sz].age));
-			printf("请输入性别\n");
-			scanf("%s", con->data[con->sz].sex);
-			printf("请输入电话号码\n");
-			scanf("%s", con->data[con->sz].tele);
-			printf("请输入地址\n");
-			scanf("%s", con->data[con->sz].add);
-		}
-	}
-
 	con->sz++;
 }
 void del_num(contact* con)
@@ -164,7 +170,27 @@ void init_con(contact* con)
 		perror("init_con");
 		return;
 	}
+	add_from(con);
 }
 //search by name ,if name is found,return index,else return 0
+void exit_num(contact* con)
+{
+	FILE* pf=fopen("contact.txt", "w");
+	if (pf == NULL)
+	{
+		perror("fopen");
+		return;
+	}
+	while (con->sz--)
+	{
+		fwrite(con->data+con->sz, 1, sizeof(person), pf);
+		
+	}
+	fclose(pf);
+	free(con->data);
+	con->data = NULL;
+	pf = NULL;
+	printf("保存成功\n");
 
+}
 
